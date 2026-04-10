@@ -1,5 +1,7 @@
 package com.tumejortarifaluz.domain.processor
 
+import com.tumejortarifaluz.BuildConfig
+
 import android.graphics.Bitmap
 import com.tumejortarifaluz.domain.model.ProcessedInvoice
 import com.google.ai.client.generativeai.GenerativeModel
