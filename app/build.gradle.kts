@@ -1,5 +1,7 @@
 
 
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
@@ -27,7 +29,7 @@ android {
         vectorDrawables.useSupportLibrary = true
 
         // Read API Key from local.properties
-        val properties = java.util.Properties()
+        val properties = Properties()
         val propertiesFile = project.rootProject.file("local.properties")
         if (propertiesFile.exists()) {
             properties.load(propertiesFile.inputStream())
