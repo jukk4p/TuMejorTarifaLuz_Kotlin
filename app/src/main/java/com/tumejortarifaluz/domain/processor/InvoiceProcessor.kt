@@ -16,12 +16,9 @@ import javax.inject.Singleton
 @Singleton
 class InvoiceProcessor @Inject constructor() {
 
-    // Using Standalone Google AI SDK (Legacy 2026 Support)
-    private val apiKey = BuildConfig.GEMINI_API_KEY
-    
     private val generativeModel = GenerativeModel(
         modelName = "gemini-2.5-flash",
-        apiKey = apiKey,
+        apiKey = BuildConfig.GEMINI_API_KEY,
         generationConfig = generationConfig {
             responseMimeType = "application/json"
         }
@@ -73,7 +70,7 @@ class InvoiceProcessor @Inject constructor() {
             val jsonResponse = response.text
             if (jsonResponse == null) {
                 android.util.Log.e("InvoiceProcessor", "Standalone AI Response NULL. Check API Key and internet.")
-                return ProcessedInvoice(company = "Error: Sin respuesta de IA")
+                return ProcessedInvoice(company = "Error: Sin respuesta de la IA")
             }
             
             android.util.Log.d("InvoiceProcessor", "Standalone AI response: $jsonResponse")
@@ -81,22 +78,34 @@ class InvoiceProcessor @Inject constructor() {
             val cleanedJson = sanitizeJson(jsonResponse)
             parseJsonResult(cleanedJson)
         } catch (e: Exception) {
-            // Robust error handling for the 404/500 cases in 2026
-            val errorMsg = e.message ?: "Unknown Server Error (Standalone 2026)"
-            android.util.Log.e("InvoiceProcessor", "Standalone AI CRITICAL ERROR: $errorMsg", e)
+            val fullError = e.message ?: "Unknown Error"
+            android.util.Log.e("InvoiceProcessor", "Standalone AI CRITICAL ERROR: $fullError", e)
             
-            // Return dummy data or error message to UI instead of crashing
-            ProcessedInvoice(company = "Error de conexión (Standalone)")
+            // Map common errors to user-friendly messages
+            val userError = when {
+                fullError.contains("429") -> "Límite de cuota excedido (API 429)"
+                fullError.contains("401") || fullError.contains("403") -> "Error de autenticación/API Key"
+                fullError.contains("404") -> "Modelo no encontrado o SDK incompatible"
+                fullError.contains("Unable to resolve host") -> "Sin conexión a internet"
+                else -> "Error: ${fullError.take(40)}..."
+            }
+            
+            ProcessedInvoice(company = userError)
         }
     }
 
     private fun sanitizeJson(raw: String): String {
-        return if (raw.contains("```json")) {
-            raw.substringAfter("```json").substringBefore("```").trim()
-        } else if (raw.contains("```")) {
-            raw.substringAfter("```").substringBefore("```").trim()
+        // More robust extraction using Regex to find { ... }
+        val jsonPattern = Regex("""\{.*\}""", RegexOption.DOT_MATCHES_ALL)
+        val match = jsonPattern.find(raw)
+        
+        return if (match != null) {
+            match.value.trim()
         } else {
-            raw.trim()
+            // Fallback to legacy markdown removal
+            raw.replace("```json", "")
+               .replace("```", "")
+               .trim()
         }
     }
 

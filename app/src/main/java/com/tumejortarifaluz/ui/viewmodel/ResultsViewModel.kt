@@ -16,7 +16,7 @@ enum class TariffFilter(val label: String, val emoji: String) {
     ALL("Todas", "⚡"),
     TOP4("Top 4", "🏆"),
     FIXED("Precio Fijo", "🔒"),
-    THREE_PERIOD("Discriminación Horaria", "🕐")
+    THREE_PERIOD("Por periodos", "🕐")
 }
 
 data class Tariff(

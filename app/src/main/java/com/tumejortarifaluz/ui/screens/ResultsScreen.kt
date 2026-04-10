@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.text.font.FontWeight
@@ -262,7 +263,7 @@ fun ResultsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding),
-            contentPadding = PaddingValues(bottom = 24.dp)
+            contentPadding = PaddingValues(bottom = 120.dp)
         ) {
             // Active filter pill (compact, only when filter is active)
             if (uiState.selectedFilter != TariffFilter.ALL) {
@@ -310,36 +311,49 @@ fun ResultsScreen(
                         modifier = Modifier.fillMaxWidth().padding(24.dp)
                     ) {
                         // Header with Pulsing Saving
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column(modifier = Modifier.weight(1f)) {
+                        Box(modifier = Modifier.fillMaxWidth()) {
+                            Column(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
                                 Text(
                                     "ESTÁS AHORRANDO",
                                     style = MaterialTheme.typography.labelSmall,
                                     fontWeight = FontWeight.Black,
                                     color = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f),
-                                    letterSpacing = 1.5.sp
+                                    letterSpacing = 1.5.sp,
+                                    textAlign = TextAlign.Center
                                 )
                                 Text(
                                     uiState.tariffs.firstOrNull()?.estimatedSaving ?: "0,00 €",
                                     style = MaterialTheme.typography.headlineLarge,
                                     fontWeight = FontWeight.Black,
-                                    color = Color(0xFF10B981)
+                                    color = Color(0xFF10B981),
+                                    textAlign = TextAlign.Center
                                 )
                                 Text(
                                     "Ahorro anual estimado",
                                     style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    textAlign = TextAlign.Center
                                 )
                             }
                             
-                            IconButton(
+                            // Small, subtle edit button in the corner
+                            Surface(
                                 onClick = onEditConsumption,
-                                modifier = Modifier.background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f), CircleShape)
+                                modifier = Modifier.align(Alignment.TopEnd).size(32.dp),
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f),
+                                shape = CircleShape
                             ) {
-                                Icon(Icons.Default.Edit, "Editar", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(18.dp))
+                                Box(contentAlignment = Alignment.Center) {
+                                    Icon(
+                                        Icons.Default.Edit, 
+                                        "Editar", 
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f), 
+                                        modifier = Modifier.size(14.dp)
+                                    )
+                                }
                             }
                         }
 
@@ -353,7 +367,8 @@ fun ResultsScreen(
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(bottom = 16.dp)
+                            modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+                            textAlign = TextAlign.Center
                         )
 
                         // Consolidated Consumption Display - Layered for absolute alignment
@@ -418,27 +433,36 @@ fun ResultsScreen(
 
                         Spacer(Modifier.height(24.dp))
 
+                        val companyName = uiState.currentInvoice?.company?.takeIf { it.isNotEmpty() && it != "Otras" }
+                        
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            // Quick Stats Box
-                            Surface(
-                                modifier = Modifier.weight(1f),
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.03f),
-                                shape = RoundedCornerShape(16.dp)
-                            ) {
-                                Column(Modifier.padding(12.dp)) {
-                                    Text("COMPAÑÍA ACTUAL", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                    Text(uiState.currentInvoice?.company ?: "Otras", fontSize = 13.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+                            if (companyName != null) {
+                                // Quick Stats Box: Company
+                                Surface(
+                                    modifier = Modifier.weight(1f),
+                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.03f),
+                                    shape = RoundedCornerShape(16.dp)
+                                ) {
+                                    Column(Modifier.padding(12.dp)) {
+                                        Text("COMPAÑÍA ACTUAL", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                        Text(companyName, fontSize = 13.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+                                    }
                                 }
                             }
+                            
+                            // Quick Stats Box: Power
                             Surface(
-                                modifier = Modifier.weight(1f),
+                                modifier = if (companyName != null) Modifier.weight(1f) else Modifier.fillMaxWidth(),
                                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.03f),
                                 shape = RoundedCornerShape(16.dp)
                             ) {
-                                Column(Modifier.padding(12.dp)) {
+                                Column(
+                                    modifier = Modifier.padding(12.dp),
+                                    horizontalAlignment = if (companyName != null) Alignment.Start else Alignment.CenterHorizontally
+                                ) {
                                     Text("POTENCIA CONTRATADA", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                     val p1 = uiState.currentInvoice?.powerP1 ?: 0.0
                                     val p2 = uiState.currentInvoice?.powerP2 ?: 0.0
@@ -750,19 +774,21 @@ fun ResultsFloatingMenu(
     onSaveClick: () -> Unit
 ) {
     Surface(
-        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f),
-        shape = RoundedCornerShape(24.dp),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)),
-        shadowElevation = 12.dp,
+        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
+        shape = RoundedCornerShape(100.dp),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)),
+        shadowElevation = 16.dp,
         modifier = Modifier
-            .padding(bottom = 16.dp)
-            .fillMaxWidth(0.9f)
-            .height(80.dp)
+            .padding(bottom = 12.dp)
+            .fillMaxWidth(0.85f)
+            .height(64.dp)
     ) {
         Row(
-            modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier.fillMaxSize(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceEvenly
         ) {
+            // FILTROS
             FloatingMenuItem(
                 icon = Icons.Default.FilterList,
                 label = "FILTROS",
@@ -770,25 +796,27 @@ fun ResultsFloatingMenu(
                 modifier = Modifier.weight(1f)
             )
             
-            VerticalDivider(
-                modifier = Modifier.height(30.dp).width(1.dp),
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f)
-            )
+            // NUEVA (Acción Principal Destacada)
+            Box(
+                modifier = Modifier
+                    .size(56.dp)
+                    .offset(y = (-8).dp)
+                    .shadow(elevation = 8.dp, shape = CircleShape)
+                    .background(MaterialTheme.colorScheme.primary, CircleShape)
+                    .clickable { onNewClick() },
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Nueva",
+                    tint = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.size(32.dp)
+                )
+            }
             
+            // GUARDAR
             FloatingMenuItem(
-                icon = Icons.Default.AddCircleOutline,
-                label = "NUEVA",
-                onClick = onNewClick,
-                modifier = Modifier.weight(1f)
-            )
-            
-            VerticalDivider(
-                modifier = Modifier.height(30.dp).width(1.dp),
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f)
-            )
-            
-            FloatingMenuItem(
-                icon = Icons.Default.AutoAwesome,
+                icon = Icons.Default.StarBorder,
                 label = "GUARDAR",
                 onClick = onSaveClick,
                 modifier = Modifier.weight(1f)
@@ -806,9 +834,9 @@ private fun FloatingMenuItem(
 ) {
     Box(
         modifier = modifier
-            .clip(RoundedCornerShape(16.dp))
+            .fillMaxHeight()
             .clickable { onClick() }
-            .padding(horizontal = 4.dp, vertical = 8.dp),
+            .padding(vertical = 8.dp),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -818,19 +846,17 @@ private fun FloatingMenuItem(
             Icon(
                 imageVector = icon,
                 contentDescription = label,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(18.dp)
+                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                modifier = Modifier.size(20.dp)
             )
-            Spacer(Modifier.height(2.dp))
+            Spacer(Modifier.height(4.dp))
             Text(
                 text = label,
                 style = MaterialTheme.typography.labelSmall,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary,
-                fontSize = 8.sp,
-                letterSpacing = 0.sp,
-                maxLines = 1,
-                overflow = androidx.compose.ui.text.style.TextOverflow.Visible
+                fontWeight = FontWeight.Black,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                fontSize = 9.sp,
+                letterSpacing = 0.5.sp
             )
         }
     }

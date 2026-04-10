@@ -42,14 +42,14 @@ import androidx.compose.ui.text.SpanStyle
 fun TuMejorTarifaLuzLogo(modifier: Modifier = Modifier) {
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
         Box(
-            modifier = Modifier.size(44.dp),
+            modifier = Modifier.size(52.dp),
             contentAlignment = Alignment.Center
         ) {
             Image(
                 painter = painterResource(id = R.drawable.logo_app),
                 contentDescription = null,
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Fit
+                modifier = Modifier.fillMaxWidth().height(48.dp),
+                contentScale = ContentScale.FillWidth
             )
         }
         Spacer(modifier = Modifier.width(10.dp))

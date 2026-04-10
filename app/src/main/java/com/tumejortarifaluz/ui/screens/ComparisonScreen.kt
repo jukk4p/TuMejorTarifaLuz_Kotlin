@@ -255,75 +255,105 @@ fun ComparisonScreen(
                             title = "Desglose de Factura",
                             icon = Icons.Default.ReceiptLong
                         ) {
-                            uiState.details.filter { !it.isTotal }.forEach { detail ->
-                                CompactDetailRow(detail.concept, detail.new)
+                            Surface(
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.03f),
+                                shape = RoundedCornerShape(20.dp),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Column(modifier = Modifier.padding(16.dp)) {
+                                    uiState.details.filter { !it.isTotal }.forEach { detail ->
+                                        CompactDetailRow(detail.concept, detail.new)
+                                    }
+                                }
                             }
                         }
                         
                         Spacer(modifier = Modifier.height(20.dp))
                         
-                        // 2. Precios Section
+                        // 2. Precios Aplicados Section
                         var showWithTaxes by remember { mutableStateOf(false) }
                         
                         PremiumSection(
                             title = "Precios Aplicados",
                             icon = Icons.Default.Payments,
                             topAction = {
-                                // Tax Toggle - Top Right Action
+                                // Tax Toggle - Segmented Control (Base vs PVP)
                                 Surface(
                                     shape = RoundedCornerShape(100.dp),
-                                    color = MaterialTheme.colorScheme.surface,
-                                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f))
+                                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f),
+                                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)),
+                                    modifier = Modifier.height(32.dp)
                                 ) {
                                     Row(
-                                        modifier = Modifier
-                                            .clickable { showWithTaxes = !showWithTaxes }
-                                            .padding(horizontal = 8.dp, vertical = 4.dp),
+                                        modifier = Modifier.fillMaxHeight(),
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
-                                        Text(
-                                            text = if (showWithTaxes) "CON" else "SIN",
-                                            style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
-                                            fontWeight = FontWeight.Black,
-                                            color = if (showWithTaxes) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
-                                            letterSpacing = 1.sp
-                                        )
-                                        Spacer(modifier = Modifier.width(4.dp))
-                                        Switch(
-                                            checked = showWithTaxes,
-                                            onCheckedChange = { showWithTaxes = it },
-                                            modifier = Modifier.scale(0.55f).height(18.dp),
-                                            colors = SwitchDefaults.colors(
-                                                checkedThumbColor = Color.White,
-                                                checkedTrackColor = MaterialTheme.colorScheme.primary,
-                                                uncheckedThumbColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
-                                                uncheckedTrackColor = MaterialTheme.colorScheme.surfaceVariant
+                                        // Option: SIN IVA (Base)
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxHeight()
+                                                .clip(RoundedCornerShape(100.dp))
+                                                .background(if (!showWithTaxes) MaterialTheme.colorScheme.primary else Color.Transparent)
+                                                .clickable { showWithTaxes = false }
+                                                .padding(horizontal = 12.dp),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Text(
+                                                text = "BASE",
+                                                style = MaterialTheme.typography.labelSmall,
+                                                fontWeight = FontWeight.Black,
+                                                color = if (!showWithTaxes) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
+                                                fontSize = 9.sp
                                             )
-                                        )
+                                        }
+                                        
+                                        // Option: CON IVA (PVP)
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxHeight()
+                                                .clip(RoundedCornerShape(100.dp))
+                                                .background(if (showWithTaxes) MaterialTheme.colorScheme.primary else Color.Transparent)
+                                                .clickable { showWithTaxes = true }
+                                                .padding(horizontal = 12.dp),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Text(
+                                                text = "PVP (IVA)",
+                                                style = MaterialTheme.typography.labelSmall,
+                                                fontWeight = FontWeight.Black,
+                                                color = if (showWithTaxes) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
+                                                fontSize = 9.sp
+                                            )
+                                        }
                                     }
                                 }
                             }
                         ) {
-                            val p1Power = if (showWithTaxes) (if (tariff.pricePowerP1WithTaxes > 0) tariff.pricePowerP1WithTaxes else tariff.pricePowerP1 * 1.105) else tariff.pricePowerP1
-                            val p2Power = if (showWithTaxes) (if (tariff.pricePowerP2WithTaxes > 0) tariff.pricePowerP2WithTaxes else tariff.pricePowerP2 * 1.105) else tariff.pricePowerP2
-                            val p1Energy = if (showWithTaxes) (if (tariff.priceEnergyP1WithTaxes > 0) tariff.priceEnergyP1WithTaxes else tariff.priceEnergyP1 * 1.105) else tariff.priceEnergyP1
-                            val p2Energy = if (showWithTaxes) (if (tariff.priceEnergyP2WithTaxes > 0) tariff.priceEnergyP2WithTaxes else tariff.priceEnergyP2 * 1.105) else tariff.priceEnergyP2
-                            val p3Energy = if (showWithTaxes) (if (tariff.priceEnergyP3WithTaxes > 0) tariff.priceEnergyP3WithTaxes else tariff.priceEnergyP3 * 1.105) else tariff.priceEnergyP3
-
-                            PriceInfoRow("Potencia Punta", String.format("%.4f €/kW/día", p1Power))
-                            PriceInfoRow("Potencia Valle", String.format("%.4f €/kW/día", p2Power))
-                            HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f))
-                            PriceInfoRow("Energía Punta", String.format("%.4f €/kWh", p1Energy))
-                            if (tariff.priceEnergyP2 > 0) {
-                                PriceInfoRow("Energía Llano", String.format("%.4f €/kWh", p2Energy))
-                            }
-                            if (tariff.priceEnergyP3 > 0) {
-                                PriceInfoRow("Energía Valle", String.format("%.4f €/kWh", p3Energy))
-                            }
-                            
-                            if (tariff.surplusPrice > 0) {
-                                HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f))
-                                PriceInfoRow("Precio Excedentes", String.format("%.4f €/kWh", tariff.surplusPrice))
+                            Surface(
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.03f),
+                                shape = RoundedCornerShape(20.dp),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Column(modifier = Modifier.padding(16.dp)) {
+                                    val tariff = uiState.tariff
+                                    if (tariff != null) {
+                                        // Potencia Group
+                                        PriceDetailRow("Potencia Punta", if (showWithTaxes) String.format("%.4f €/kW/día", tariff.pricePowerP1WithTaxes) else String.format("%.4f €/kW/día", tariff.pricePowerP1), Icons.Default.FlashOn, Color(0xFF3B82F6))
+                                        PriceDetailRow("Potencia Valle", if (showWithTaxes) String.format("%.4f €/kW/día", tariff.pricePowerP2WithTaxes) else String.format("%.4f €/kW/día", tariff.pricePowerP2), Icons.Default.FlashOn, Color(0xFF3B82F6))
+                                        
+                                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f))
+                                        
+                                        // Energía Group
+                                        PriceDetailRow("Energía Punta", if (showWithTaxes) String.format("%.4f €/kWh", tariff.priceEnergyP1WithTaxes) else String.format("%.4f €/kWh", tariff.priceEnergyP1), Icons.Default.Bolt, Color(0xFFFBBF24))
+                                        PriceDetailRow("Energía Llano", if (showWithTaxes) String.format("%.4f €/kWh", tariff.priceEnergyP2WithTaxes) else String.format("%.4f €/kWh", tariff.priceEnergyP2), Icons.Default.Bolt, Color(0xFFFBBF24))
+                                        PriceDetailRow("Energía Valle", if (showWithTaxes) String.format("%.4f €/kWh", tariff.priceEnergyP3WithTaxes) else String.format("%.4f €/kWh", tariff.priceEnergyP3), Icons.Default.Bolt, Color(0xFFFBBF24))
+                                        
+                                        if (tariff.surplusPrice > 0) {
+                                            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f))
+                                            PriceDetailRow("Precio Excedentes", String.format("%.4f €/kWh", tariff.surplusPrice), Icons.Default.WbSunny, Color(0xFFF97316))
+                                        }
+                                    }
+                                }
                             }
                         }
                         
@@ -419,24 +449,79 @@ fun PremiumSection(
 
 @Composable
 fun CompactDetailRow(label: String, value: String) {
+    val icon = when {
+        label.contains("Potencia", ignoreCase = true) -> Icons.Default.FlashOn
+        label.contains("Energía", ignoreCase = true) -> Icons.Default.Bolt
+        label.contains("IVA", ignoreCase = true) || label.contains("Impuesto", ignoreCase = true) -> Icons.Default.Percent
+        label.contains("Contador", ignoreCase = true) -> Icons.Default.Timer
+        label.contains("Bono", ignoreCase = true) -> Icons.Default.Verified
+        else -> Icons.Default.Label
+    }
+    
+    val color = when {
+        label.contains("Potencia", ignoreCase = true) -> Color(0xFF3B82F6) // Blue
+        label.contains("Energía", ignoreCase = true) -> Color(0xFFFBBF24) // Yellow
+        label.contains("IVA", ignoreCase = true) || label.contains("Impuesto", ignoreCase = true) -> Color(0xFFF87171) // Red
+        else -> MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+    }
+
     Row(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp),
+        modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = label, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Text(text = value, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Black)
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+            Icon(
+                imageVector = icon, 
+                contentDescription = null, 
+                tint = color, 
+                modifier = Modifier.size(16.dp)
+            )
+            Spacer(Modifier.width(12.dp))
+            Text(
+                text = label, 
+                style = MaterialTheme.typography.bodyMedium, 
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1
+            )
+        }
+        Text(
+            text = value, 
+            style = MaterialTheme.typography.bodyLarge, 
+            color = MaterialTheme.colorScheme.onSurface, 
+            fontWeight = FontWeight.Black
+        )
     }
 }
 
 @Composable
-fun PriceInfoRow(label: String, value: String) {
+fun PriceDetailRow(label: String, value: String, icon: ImageVector = Icons.Default.Label, color: Color = MaterialTheme.colorScheme.primary) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = label, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Text(text = value, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+            Icon(
+                imageVector = icon, 
+                contentDescription = null, 
+                tint = color.copy(alpha = 0.8f), 
+                modifier = Modifier.size(14.dp)
+            )
+            Spacer(Modifier.width(10.dp))
+            Text(
+                text = label, 
+                style = MaterialTheme.typography.bodyLarge, 
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontSize = 15.sp
+            )
+        }
+        Text(
+            text = value, 
+            style = MaterialTheme.typography.bodyLarge, 
+            color = MaterialTheme.colorScheme.onSurface, 
+            fontWeight = FontWeight.Black,
+            fontSize = 15.sp
+        )
     }
 }
