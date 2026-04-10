@@ -15,32 +15,32 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.Color
 
 private val DarkColorScheme = darkColorScheme(
-    primary = PrimaryBlue,
-    secondary = SecondaryBlue,
-    background = BackgroundOLED,
-    surface = SurfaceCard,
+    primary = PrimaryTeal,
+    secondary = AIPurple,
+    background = BackgroundDeep,
+    surface = BackgroundOLED,
     onPrimary = Color.White,
     onSecondary = Color.White,
     onBackground = TextPrimary,
     onSurface = TextPrimary,
-    surfaceVariant = BorderColor,
+    surfaceVariant = SurfaceCard,
     onSurfaceVariant = TextSecondary,
-    error = Color(0xFFEF4444),
+    error = ErrorRed,
     onError = Color.White
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = PrimaryBlue,
-    secondary = SecondaryBlue,
-    background = Color(0xFFF8FAFC),
+    primary = PrimaryTeal,
+    secondary = AIPurple,
+    background = Color(0xFFF8FAFC), // Slate 50
     surface = Color.White,
     onPrimary = Color.White,
     onSecondary = Color.White,
     onBackground = Color(0xFF0F172A),
     onSurface = Color(0xFF0F172A),
-    surfaceVariant = Color(0xFFE2E8F0),
+    surfaceVariant = Color(0xFFF1F5F9),
     onSurfaceVariant = Color(0xFF64748B),
-    error = Color(0xFFEF4444),
+    error = ErrorRed,
     onError = Color.White
 )
 

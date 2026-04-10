@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -44,17 +45,17 @@ fun ValidationScreen(
                     IconButton(onClick = onBack) { 
                         Surface(
                             modifier = Modifier.size(40.dp),
-                            color = Color.White.copy(alpha = 0.05f),
+                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.05f),
                             shape = CircleShape,
-                            border = BorderStroke(1.dp, Color.White.copy(alpha = 0.1f))
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f))
                         ) {
-                            Icon(Icons.Default.ArrowBack, contentDescription = null, tint = Color.White, modifier = Modifier.padding(10.dp))
+                            Icon(Icons.Default.ArrowBack, contentDescription = null, tint = MaterialTheme.colorScheme.onBackground, modifier = Modifier.padding(10.dp))
                         }
                     }
                 },
                 title = {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("VERIFICACIÓN", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Black, color = Color.White, letterSpacing = 2.sp)
+                        Text("VERIFICACIÓN", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.onBackground, letterSpacing = 2.sp)
                     }
                 }
             )
@@ -72,12 +73,12 @@ fun ValidationScreen(
                         text = "Confirma tus datos", 
                         style = MaterialTheme.typography.displaySmall.copy(fontSize = 30.sp), 
                         fontWeight = FontWeight.Black, 
-                        color = Color.White
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                     Text(
                         text = "Hemos extraído esta información de tu factura. Asegúrate de que todo sea correcto.", 
                         style = MaterialTheme.typography.bodyLarge, 
-                        color = TextSecondary,
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
                         modifier = Modifier.padding(top = 4.dp)
                     )
                 }
@@ -87,9 +88,11 @@ fun ValidationScreen(
             item {
                 Card(
                     modifier = Modifier.fillMaxWidth().height(260.dp),
-                    colors = CardDefaults.cardColors(containerColor = SurfaceCard),
+                    colors = CardDefaults.cardColors(
+                        containerColor = if (MaterialTheme.colorScheme.background.luminance() < 0.5f) SurfaceCard else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                    ),
                     shape = RoundedCornerShape(32.dp),
-                    border = BorderStroke(1.dp, Color.White.copy(alpha = 0.1f))
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.onBackground.copy(alpha = 0.08f))
                 ) {
                     Box(modifier = Modifier.fillMaxSize()) {
                         // Background pattern / image placeholder
@@ -155,7 +158,7 @@ fun ValidationScreen(
                         text = "DATOS DETECTADOS", 
                         style = MaterialTheme.typography.labelSmall, 
                         fontWeight = FontWeight.Black, 
-                        color = TextSecondary, 
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f), 
                         letterSpacing = 2.sp
                     )
                     Spacer(Modifier.width(8.dp))
@@ -217,7 +220,7 @@ fun ValidationScreen(
                         onClick = onBack,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("No es correcto, quiero editar", color = TextSecondary, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+                        Text("No es correcto, quiero editar", color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f), fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
                     }
                 }
                 
@@ -288,9 +291,11 @@ fun ValidationScreen(
 fun ValidationItem(icon: ImageVector, label: String, value: String, onClick: () -> Unit = {}) {
     Card(
         modifier = Modifier.fillMaxWidth().clickable { onClick() },
-        colors = CardDefaults.cardColors(containerColor = SurfaceCard),
+        colors = CardDefaults.cardColors(
+            containerColor = if (MaterialTheme.colorScheme.background.luminance() < 0.5f) SurfaceCard else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
+        ),
         shape = RoundedCornerShape(24.dp),
-        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.05f))
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.onBackground.copy(alpha = 0.05f))
     ) {
         Row(
             modifier = Modifier.padding(20.dp).fillMaxWidth(),
@@ -306,8 +311,8 @@ fun ValidationItem(icon: ImageVector, label: String, value: String, onClick: () 
             }
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text(text = label, style = MaterialTheme.typography.labelSmall, color = TextSecondary, fontWeight = FontWeight.Black)
-                Text(text = value, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Black, color = Color.White)
+                Text(text = label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.Black)
+                Text(text = value, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.onSurface)
             }
             Icon(Icons.Default.Edit, null, tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f), modifier = Modifier.size(16.dp))
         }

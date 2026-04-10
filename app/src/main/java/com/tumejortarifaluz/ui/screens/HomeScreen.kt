@@ -7,7 +7,9 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.BorderStroke
@@ -18,6 +20,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.tumejortarifaluz.ui.components.*
 import com.tumejortarifaluz.ui.viewmodel.HomeViewModel
+import com.tumejortarifaluz.ui.viewmodel.HomeUiState
 import androidx.compose.foundation.shape.RoundedCornerShape
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -87,6 +90,31 @@ fun HomeScreen(
                     onMoreInfoClick = onNavigateToManual,
                     totalSaving = uiState.totalSaving,
                     lastAnalysisDate = uiState.lastAnalysisDate
+                )
+            }
+
+            item {
+                PriceUrgencyBar(
+                    currentPrice = uiState.currentPrice,
+                    zoneLabel = uiState.priceZone,
+                    onCompareClick = onNavigateToUpload
+                )
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(24.dp))
+                Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+                    PremiumHeroIllustration(
+                        totalSaving = uiState.totalSaving,
+                        lastAnalysisDate = uiState.lastAnalysisDate
+                    )
+                }
+            }
+
+            item {
+                ComparatorSelectionSection(
+                    onUploadClick = onNavigateToUpload,
+                    onManualClick = onNavigateToManual
                 )
             }
             

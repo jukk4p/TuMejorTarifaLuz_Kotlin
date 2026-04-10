@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -32,9 +33,13 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.tumejortarifaluz.ui.components.TuMejorTarifaLuzLogo
+import com.tumejortarifaluz.ui.theme.BackgroundDeep
+import com.tumejortarifaluz.ui.theme.BackgroundOLED
+import com.tumejortarifaluz.ui.theme.TextSecondary
 import com.tumejortarifaluz.ui.viewmodel.UploadViewModel
+import com.tumejortarifaluz.ui.viewmodel.UploadUiState
 import com.tumejortarifaluz.domain.model.ProcessedInvoice
+import com.tumejortarifaluz.ui.components.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -80,14 +85,14 @@ fun UploadInvoiceScreen(
                     IconButton(onClick = {}) {
                         Surface(
                             modifier = Modifier.size(36.dp),
-                            color = if (uiState.isLoggedIn) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.05f),
+                            color = if (uiState.isLoggedIn) MaterialTheme.colorScheme.primary else Color.White.copy(alpha = 0.05f),
                             shape = CircleShape,
-                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f))
+                            border = BorderStroke(1.dp, Color.White.copy(alpha = 0.1f))
                         ) {
                             Icon(
                                 Icons.Default.Person,
                                 contentDescription = null,
-                                tint = if (uiState.isLoggedIn) Color.White else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
+                                tint = if (uiState.isLoggedIn) Color.White else TextSecondary,
                                 modifier = Modifier.padding(8.dp)
                             )
                         }
@@ -121,7 +126,7 @@ fun UploadInvoiceScreen(
                     Text(
                         text = "Empecemos analizando tu factura actual.", 
                         style = MaterialTheme.typography.bodyLarge, 
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
                         modifier = Modifier.padding(top = 4.dp),
                         textAlign = TextAlign.Center
                     )
@@ -136,21 +141,15 @@ fun UploadInvoiceScreen(
                         .clip(RoundedCornerShape(32.dp))
                         .background(
                             androidx.compose.ui.graphics.Brush.verticalGradient(
-                                colors = listOf(
-                                    MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
-                                    MaterialTheme.colorScheme.background.copy(alpha = 0.95f)
-                                )
+                                colors = if (MaterialTheme.colorScheme.background.luminance() < 0.5f)
+                                    listOf(BackgroundOLED, BackgroundDeep)
+                                else
+                                    listOf(Color.White, Color.White.copy(alpha = 0.8f))
                             )
                         )
                         .border(
                             1.dp,
-                            androidx.compose.ui.graphics.Brush.linearGradient(
-                                colors = listOf(
-                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
-                                    Color.Transparent,
-                                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
-                                )
-                            ),
+                            MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f),
                             RoundedCornerShape(32.dp)
                         )
                         .padding(24.dp)
@@ -169,8 +168,8 @@ fun UploadInvoiceScreen(
                             }
                             Spacer(modifier = Modifier.width(16.dp))
                             Column {
-                                Text(text = "Analizador de factura", fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.onSurface, fontSize = 18.sp)
-                                Text(text = "Detección inteligente de datos", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text(text = "Analizador de factura", fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.onBackground, fontSize = 18.sp)
+                                Text(text = "Detección inteligente de datos", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f))
                             }
                         }
                         
@@ -211,8 +210,8 @@ fun UploadInvoiceScreen(
                                     Icon(Icons.Default.CloudUpload, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(28.dp))
                                 }
                                 Spacer(modifier = Modifier.height(16.dp))
-                                Text("Toca para subir una foto o PDF", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
-                                Text("Formatos admitidos: JPG, PNG, PDF", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
+                                Text("Toca para subir una foto o PDF", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onBackground, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+                                Text("Formatos admitidos: JPG, PNG, PDF", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f), textAlign = TextAlign.Center)
                             }
                         }
                         
@@ -235,7 +234,7 @@ fun UploadInvoiceScreen(
                             onClick = onNavigateToManual,
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text("O introduce los datos manualmente", color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.Bold, fontSize = 13.sp, textAlign = TextAlign.Center)
+                            Text("O introduce los datos manualmente", color = TextSecondary, fontWeight = FontWeight.Bold, fontSize = 13.sp, textAlign = TextAlign.Center)
                         }
                     }
                 }

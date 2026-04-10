@@ -38,6 +38,10 @@ import com.tumejortarifaluz.ui.viewmodel.ComparisonViewModel
 import com.tumejortarifaluz.ui.utils.LogoMapper
 import coil.compose.rememberAsyncImagePainter
 
+import com.tumejortarifaluz.ui.theme.BackgroundDeep
+import com.tumejortarifaluz.ui.theme.BackgroundOLED
+import com.tumejortarifaluz.ui.theme.TextSecondary
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ComparisonScreen(
@@ -58,9 +62,9 @@ fun ComparisonScreen(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             CenterAlignedTopAppBar(
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.Transparent),
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = MaterialTheme.colorScheme.background),
                 navigationIcon = {
-                    IconButton(onClick = onBack, modifier = Modifier.background(MaterialTheme.colorScheme.surface.copy(alpha = 0.5f), CircleShape)) { 
+                    IconButton(onClick = onBack, modifier = Modifier.background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.05f), CircleShape)) { 
                         Icon(Icons.Default.ArrowBack, contentDescription = null, tint = MaterialTheme.colorScheme.onBackground) 
                     }
                 },
@@ -76,7 +80,7 @@ fun ComparisonScreen(
                             }
                             context.startActivity(Intent.createChooser(intent, "Compartir tarifa"))
                         }
-                    }, modifier = Modifier.background(MaterialTheme.colorScheme.surface.copy(alpha = 0.5f), CircleShape)) { 
+                    }, modifier = Modifier.background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.05f), CircleShape)) { 
                         Icon(Icons.Default.Share, contentDescription = null, tint = MaterialTheme.colorScheme.onBackground) 
                     }
                     Spacer(Modifier.width(16.dp))
@@ -87,7 +91,7 @@ fun ComparisonScreen(
             if (tariff != null) {
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
-                    color = MaterialTheme.colorScheme.background.copy(alpha = 0.9f),
+                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f),
                     shadowElevation = 16.dp
                 ) {
                     Button(
@@ -102,7 +106,7 @@ fun ComparisonScreen(
                     ) {
                         Text("CONTRATAR ESTA TARIFA", fontWeight = FontWeight.Black, letterSpacing = 1.sp, fontSize = 16.sp)
                         Spacer(modifier = Modifier.width(12.dp))
-                        Icon(Icons.Default.ArrowForward, contentDescription = null, modifier = Modifier.size(20.dp))
+                        Icon(Icons.Default.ArrowForward, contentDescription = null, modifier = Modifier.size(20.dp), tint = Color.White)
                     }
                 }
             }
@@ -124,12 +128,13 @@ fun ComparisonScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         // Company Logo & Name Card
+                        val isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
                         Surface(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(160.dp),
                             shape = RoundedCornerShape(32.dp),
-                            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
+                            color = if (isDark) BackgroundOLED else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
                             border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))
                         ) {
                             Column(
@@ -144,7 +149,7 @@ fun ComparisonScreen(
                                     Image(
                                         painter = rememberAsyncImagePainter(model = LogoMapper.getLogoForCompany(
                                             company = tariff.company,
-                                            isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
+                                            isDark = isDark
                                         )),
                                         contentDescription = tariff.company,
                                         modifier = Modifier.fillMaxHeight().fillMaxWidth(0.85f)
@@ -168,7 +173,7 @@ fun ComparisonScreen(
                                 "ESTIMACIÓN MENSUAL",
                                 style = MaterialTheme.typography.labelSmall,
                                 fontWeight = FontWeight.Black,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                                color = TextSecondary,
                                 letterSpacing = 2.sp
                             )
                             
@@ -180,7 +185,7 @@ fun ComparisonScreen(
                                         lineHeight = 72.sp
                                     ),
                                     fontWeight = FontWeight.Black,
-                                    color = MaterialTheme.colorScheme.onSurface,
+                                    color = MaterialTheme.colorScheme.onBackground,
                                     letterSpacing = (-2).sp
                                 )
                                 Column(modifier = Modifier.padding(bottom = 12.dp, start = 4.dp)) {
@@ -188,12 +193,12 @@ fun ComparisonScreen(
                                         text = "€",
                                         style = MaterialTheme.typography.headlineMedium,
                                         fontWeight = FontWeight.Black,
-                                        color = MaterialTheme.colorScheme.onSurface
+                                        color = MaterialTheme.colorScheme.onBackground
                                     )
                                     Text(
                                         text = "neto/mes",
                                         style = MaterialTheme.typography.labelSmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
                                     )
                                 }
                             }
@@ -404,8 +409,10 @@ fun PremiumSection(
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.4f)),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))
+        colors = CardDefaults.cardColors(
+            containerColor = if (MaterialTheme.colorScheme.background.luminance() < 0.5f) BackgroundOLED else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
+        ),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f))
     ) {
         Box(modifier = Modifier.fillMaxWidth()) {
             if (topAction != null) {

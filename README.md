@@ -1,56 +1,46 @@
 # TuMejorTarifaLuz ⚡
 
-TuMejorTarifaLuz es una aplicación Android desarrollada en **Kotlin** con **Jetpack Compose** diseñada para ayudar a los usuarios en España a comparar y encontrar la mejor tarifa eléctrica según su consumo real.
+TuMejorTarifaLuz es una aplicación Android de última generación desarrollada en **Kotlin** con **Jetpack Compose**, diseñada para ayudar a los usuarios en España a optimizar su gasto energético y encontrar la mejor tarifa eléctrica basada en su consumo real.
 
-> [!NOTE]
-> Esta aplicación es una **adaptación a Kotlin de la versión web** de [tumejortarifaluz.es](https://www.tumejortarifaluz.es), ofreciendo una experiencia simplificada y optimizada para dispositivos Android.
+> [!IMPORTANT]
+> **Modernización UI/UX (Abril 2026)**: La aplicación ha sido rediseñada completamente con un sistema de diseño "Slate & Teal", ofreciendo una experiencia premium y adaptativa tanto en **Modo Claro** como en **Modo Oscuro**.
 
-## 🚀 Características
+## 🚀 Características Principales
 
-- **Comparador Inteligente**: Analiza tu consumo en diferentes periodos (Punta, Llano, Valle) y lo compara con las tarifas más competitivas del mercado.
-- **Base de Datos de Tarifas Actualizada**: Incluye tarifas de las principales comercializadoras (Niba, Octopus, Imagina, Visalia, Repsol, Iberdrola, Endesa, etc.).
-- **Escaneo de Facturas**: (En desarrollo) Sube tu factura y deja que la app extraiga los datos automáticamente.
-- **Cálculos Precisos**: Implementa la lógica real de facturación eléctrica en España, incluyendo Impuesto Eléctrico (IEE), Bono Social, Alquiler de Contador e IVA.
-- **Gráficos de Consumo**: Visualiza tu gasto y potencia contratada de forma intuitiva.
+- **Escaneo Inteligente con IA (Gemini)**: Olvídate de meter datos a mano. Adjunta tu factura en PDF o JPG y nuestra integración con la IA de Google extraerá automáticamente CUPS, consumos (P1, P2, P3), potencias y más.
+- **Comparador en Tiempo Real**: Analiza tu consumo actual y lo enfrenta a las tarifas más competitivas de comercializadoras como Octopus, Niba, Imagina, Visalia, Repsol, Iberdrola, y más.
+- **Sistema de Temas Adaptativo**: Interfaz elegante que respeta la configuración del sistema, utilizando degradados dinámicos y tokens de Material3 para una legibilidad perfecta.
+- **Cálculos de Ingeniería Eléctrica**: Implementación exacta de la normativa española (IEE, Bono Social, Alquiler de Contador, IVA dinámico).
+- **Dashboard de Ahorro**: Visualización clara de cuánto podrías ahorrar al año con cada oferta.
 
-## 🛠️ Stack Tecnológico
+## ⚙️ Stack Tecnológico
 
-- **Lenguaje**: Kotlin
-- **UI**: Jetpack Compose (Modern Android UI)
-- **Arquitectura**: MVVM (Model-View-ViewModel) + Clean Architecture
-- **Inyección de Dependencias**: Hilt (Dagger)
-- **Base de Datos**: Room (SQLite)
-- **Networking**: Corrutinas de Kotlin + Flow
-- **Navegación**: Compose Navigation
-- **Serialización**: Kotlin Serialization
+- **Language**: Kotlin 2.1.0
+- **UI Framework**: Jetpack Compose (Modern Design System)
+- **AI Engine**: Google Gemini 1.5/2.5 Flash SDK
+- **Architecture**: MVVM + Clean Architecture + Repository Pattern
+- **DI**: Hilt (Dagger)
+- **Persistence**: Room Database (SQLite)
+- **Reactive Stream**: Kotlin Coroutines & Flow
+- **Navigation**: Type-safe Compose Navigation
 
-## 📊 Lógica de Cálculo
+## 📊 Lógica de Cálculo y Ahorro
 
-La aplicación desglosa cada factura en:
-1. **Término de Potencia**: Coste fijo por los kW contratados.
-2. **Término de Energía**: Coste variable según los kWh consumidos.
-3. **Impuesto sobre la Electricidad (IEE)**: 0.5% sobre la suma anterior.
-4. **Costes Regulados**: Bono social y alquiler de contador.
-5. **IVA**: Aplicado sobre la base imponible (10% por defecto).
+La aplicación realiza una simulación completa de tu factura:
+1. **Término de Potencia**: Desglose por periodos de potencia contratada.
+2. **Término de Energía**: Aplicación de precios por periodos (Punta, Llano, Valle).
+3. **Impuestos**: IEE (0.5%) e IVA (según configuración del mercado).
+4. **Cargos Fijos**: Gestión del Bono Social y alquiler de equipos de medida.
 
-Puedes encontrar más detalles sobre la lógica en [TARIFAS_Y_LOGICA.md](./TARIFAS_Y_LOGICA.md).
+Consulta [TARIFAS_Y_LOGICA.md](./TARIFAS_Y_LOGICA.md) para profundizar en lógicas específicas.
 
-## 📦 Estructura del Proyecto
+## 🛠️ Instalación y Setup
 
-- `app/src/main/java/com/tumejortarifaluz/`
-  - `di/`: Módulos de inyección de dependencias.
-  - `domain/`: Lógica de negocio (calculadoras, modelos).
-  - `ui/`: Componentes, pantallas y ViewModels.
-  - `navigation/`: Definición de rutas de la app.
-  - `util/`: Utilidades generales.
-
-## 🛠️ Instalación y Uso
-
-1. Clona el repositorio.
-2. Abre el proyecto en **Android Studio (Ladybug o superior)**.
-3. Sincroniza con Gradle.
-4. Ejecuta en un emulador o dispositivo físico.
+1. **Clonado**: `git clone https://github.com/jukk4p/TuMejorTarifaLuz_Kotlin.git`
+2. **Requisitos**: Android Studio Ladybug (o superior).
+3. **API Key**: Agrega tu `GEMINI_API_KEY` en el archivo `local.properties` para habilitar el escaneo inteligente.
+4. **Compilación**: Sincroniza con Gradle y ejecuta en tu dispositivo.
 
 ---
 
-Desarrollado con ❤️ para ahorrar en la factura de la luz.
+Desarrollado con ❤️ por **Iván González** para empoderar al consumidor eléctrico.

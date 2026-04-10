@@ -30,13 +30,116 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.platform.LocalUriHandler
 import com.tumejortarifaluz.R
-import com.tumejortarifaluz.ui.theme.PremiumGradient
-import com.tumejortarifaluz.ui.theme.BorderColor
-import com.tumejortarifaluz.ui.theme.SurfaceCard
-import com.tumejortarifaluz.ui.theme.TextSecondary
+import com.tumejortarifaluz.ui.theme.*
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.unit.Dp
+@Composable
+fun PriceUrgencyBar(
+    currentPrice: Double = 0.1759,
+    zoneLabel: String = "Precio normal",
+    onCompareClick: () -> Unit
+) {
+    Surface(
+        color = if (MaterialTheme.colorScheme.background.luminance() < 0.5f) Color(0xFF020617) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+        modifier = Modifier.fillMaxWidth().drawBorderVertical(1.dp, MaterialTheme.colorScheme.onBackground.copy(alpha = 0.05f))
+    ) {
+        Box(modifier = Modifier.fillMaxWidth()) {
+            // Subtle accent glow
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .width(100.dp)
+                    .background(
+                        Brush.horizontalGradient(
+                            listOf(MaterialTheme.colorScheme.primary.copy(alpha = 0.08f), Color.Transparent)
+                        )
+                    )
+            )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 20.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Surface(
+                        modifier = Modifier.size(42.dp),
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
+                        shape = RoundedCornerShape(12.dp),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
+                    ) {
+                        Icon(
+                            Icons.Default.Bolt,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(10.dp)
+                        )
+                    }
+                    Spacer(Modifier.width(16.dp))
+                    Column {
+          Text(
+            "PRECIO AHORA",
+            style = MaterialTheme.typography.labelSmall.copy(
+                fontWeight = FontWeight.Black,
+                letterSpacing = 1.5.sp
+            ),
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+        )
+        Row(verticalAlignment = Alignment.Bottom) {
+            Text(
+                String.format("%.4f", currentPrice),
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontWeight = FontWeight.Black,
+                    fontSize = 24.sp
+                ),
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            Text(
+                " €/kWh",
+                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
+                modifier = Modifier.padding(bottom = 4.dp, start = 4.dp)
+            )
+        }
+        Text(
+            zoneLabel.uppercase(),
+            style = MaterialTheme.typography.labelSmall.copy(
+                fontWeight = FontWeight.Black,
+                letterSpacing = 0.5.sp
+            ),
+            color = if (zoneLabel.contains("V") || zoneLabel.contains("v")) SuccessGreen else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+        )
+    }
+}
+
+                Button(
+                    onClick = onCompareClick,
+                    modifier = Modifier.height(44.dp),
+                    shape = RoundedCornerShape(14.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                    contentPadding = PaddingValues(horizontal = 16.dp)
+                ) {
+                    Text("COMPARAR", fontWeight = FontWeight.Black, fontSize = 12.sp)
+                }
+            }
+        }
+    }
+}
+
+private fun Modifier.drawBorderVertical(vertical: Dp, color: Color): Modifier = this.then(
+    Modifier.drawBehind {
+        val strokeWidth = vertical.toPx()
+        drawLine(color, Offset(0f, 0f), Offset(size.width, 0f), strokeWidth)
+        drawLine(color, Offset(0f, size.height), Offset(size.width, size.height), strokeWidth)
+    }
+)
 
 @Composable
 fun TuMejorTarifaLuzLogo(modifier: Modifier = Modifier) {
@@ -64,7 +167,7 @@ fun TuMejorTarifaLuzLogo(modifier: Modifier = Modifier) {
                 fontWeight = FontWeight.Black,
                 letterSpacing = (-0.5).sp
             ),
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onBackground,
             maxLines = 1,
             softWrap = false
         )
@@ -78,156 +181,349 @@ fun MobileHero(
     totalSaving: String = "+35.40€",
     lastAnalysisDate: String = "No analizado"
 ) {
+    val isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
+    val heroGradientColors = if (isDark) {
+        listOf(Color(0xFF1E293B).copy(alpha = 0.3f), BackgroundDeep)
+    } else {
+        listOf(MaterialTheme.colorScheme.primary.copy(alpha = 0.08f), Color.White)
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(520.dp)
+            .drawBehind {
+                drawRect(
+                    Brush.radialGradient(
+                        colors = heroGradientColors,
+                        center = Offset(size.width * 0.8f, size.height * 0.2f),
+                        radius = size.width * 1.5f
+                    )
+                )
+            }
+            .padding(24.dp)
+    ) {
+        Column {
+            Spacer(modifier = Modifier.height(32.dp))
+            
+            // Badge Minimalista Premium
+            Surface(
+                color = Color.White.copy(alpha = 0.05f),
+                shape = CircleShape,
+                border = BorderStroke(1.dp, Color.White.copy(alpha = 0.1f))
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(modifier = Modifier.size(6.dp).background(PrimaryTeal, CircleShape))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("INTELIGENCIA ARTIFICIAL", style = MaterialTheme.typography.labelSmall, color = Color.White.copy(alpha = 0.7f), fontWeight = FontWeight.Black, letterSpacing = 2.sp)
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Título de Impacto: Tipografía "Mega"
+            Text(
+                text = "Tu ahorro máximo\ncomienza aquí.",
+                style = MaterialTheme.typography.displayMedium.copy(
+                    fontWeight = FontWeight.Black,
+                    lineHeight = 52.sp,
+                    letterSpacing = (-2).sp,
+                    fontSize = 48.sp
+                ),
+                color = MaterialTheme.colorScheme.onBackground
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = "Analizamos miles de combinaciones en tiempo real para encontrarte el precio más bajo.",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+                modifier = Modifier.fillMaxWidth(0.9f),
+                lineHeight = 24.sp
+            )
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            // Card "Obsidian" de Ahorro
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                color = if (MaterialTheme.colorScheme.background.luminance() < 0.5f) BackgroundOLED.copy(alpha = 0.8f) else Color.White,
+                shape = RoundedCornerShape(32.dp),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f))
+            ) {
+                Row(
+                    modifier = Modifier.padding(24.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Text("Ahorro actual", color = TextSecondary, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+                        Text(totalSaving, color = PrimaryTeal, style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Black)
+                    }
+                    
+                    // Botón de acción flotante interno
+                    IconButton(
+                        onClick = onUploadClick,
+                        modifier = Modifier
+                            .size(64.dp)
+                            .background(
+                                Brush.linearGradient(listOf(PrimaryTeal, Color(0xFF0D9488))),
+                                CircleShape
+                            )
+                    ) {
+                        Icon(Icons.Default.Upload, null, tint = Color.Black, modifier = Modifier.size(28.dp))
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun PremiumHeroIllustration(
+    totalSaving: String,
+    lastAnalysisDate: String
+) {
+    // Premium Hero Illustration
+    Box(
+        modifier = Modifier
+            .fillMaxWidth(0.92f)
+            .aspectRatio(1.4f)
+            .clip(RoundedCornerShape(32.dp))
+            .background(
+                Brush.verticalGradient(
+                    colors = if (MaterialTheme.colorScheme.background.luminance() < 0.5f)
+                        listOf(Color(0xFF0F172A), Color(0xFF030712))
+                    else
+                        listOf(Color(0xFFE2E8F0), Color(0xFFF1F5F9))
+                )
+            )
+            .border(1.dp, MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f), RoundedCornerShape(32.dp)),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize().padding(32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // Header of the "mock card"
+            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Box(modifier = Modifier.size(10.dp).background(Color(0xFFEF4444), CircleShape))
+                Spacer(Modifier.width(6.dp))
+                Box(modifier = Modifier.size(10.dp).background(Color(0xFFF59E0B), CircleShape))
+                Spacer(Modifier.width(6.dp))
+                Box(modifier = Modifier.size(10.dp).background(Color(0xFF10B981), CircleShape))
+                Spacer(Modifier.weight(1f))
+                Icon(Icons.Default.BarChart, null, tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f), modifier = Modifier.size(16.dp))
+            }
+            
+            Spacer(modifier = Modifier.height(32.dp))
+            
+            // Visual chart bars
+            Row(
+                modifier = Modifier.fillMaxWidth().weight(1f),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Bottom
+            ) {
+                repeat(14) { i ->
+                    val targetHeight = listOf(40, 60, 45, 80, 55, 90, 70, 40, 65, 85, 30, 75, 50, 95)[i]
+                    Box(
+                        modifier = Modifier
+                            .width(10.dp)
+                            .fillMaxHeight(targetHeight / 100f)
+                            .clip(RoundedCornerShape(4.dp, 4.dp, 0.dp, 0.dp))
+                            .background(
+                                Brush.verticalGradient(
+                                    colors = if (i == 6) listOf(MaterialTheme.colorScheme.primary, Color(0xFF6366F1))
+                                    else listOf(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f), MaterialTheme.colorScheme.onBackground.copy(alpha = 0.05f))
+                                )
+                            )
+                    )
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(24.dp))
+            
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.05f), RoundedCornerShape(16.dp))
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceAround
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("AHORRO", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f), fontWeight = FontWeight.Black)
+                    val savingText = if (totalSaving.startsWith("+") || totalSaving.startsWith("-")) totalSaving else "+$totalSaving"
+                    Text(savingText, fontWeight = FontWeight.Black, color = Color(0xFF10B981), fontSize = 18.sp)
+                }
+                Box(modifier = Modifier.height(40.dp).width(1.dp).background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f)))
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("ESTADO", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f), fontWeight = FontWeight.Black)
+                    val statusText = if (lastAnalysisDate == "No analizado") "PENDIENTE" else "OPTIMIZADO"
+                    Text(statusText, fontWeight = FontWeight.Black, color = if (statusText == "OPTIMIZADO") Color(0xFF10B981) else MaterialTheme.colorScheme.onBackground, fontSize = 18.sp)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ComparatorSelectionSection(
+    onUploadClick: () -> Unit,
+    onManualClick: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 40.dp, bottom = 24.dp),
+            .padding(vertical = 48.dp, horizontal = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Surface(
-            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
-            shape = RoundedCornerShape(100.dp),
-            modifier = Modifier.padding(bottom = 24.dp),
-            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.3f))
-        ) {
-            Text(
-                text = "✨ Tu ahorro real, garantizado",
-                modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp),
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Black,
-                letterSpacing = 1.sp
-            )
-        }
-
         Text(
-            text = "Comparamos más de 25 tarifas\npara ofrecerte un ahorro",
-            style = MaterialTheme.typography.displayMedium.copy(
-                fontWeight = FontWeight.Black,
-                lineHeight = 48.sp,
-                letterSpacing = (-1).sp
-            ),
-            textAlign = TextAlign.Center,
+            text = "¿CÓMO PREFIERES COMPARAR?",
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.primary,
+            fontWeight = FontWeight.Black,
+            letterSpacing = 2.sp
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        Text(
+            text = "Elige el método de análisis",
+            style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Black),
             color = MaterialTheme.colorScheme.onBackground
+        )
+        
+        Spacer(modifier = Modifier.height(40.dp))
+
+        // Card 1: Subir Factura (OCR)
+        ComparatorOptionCard(
+            title = "Analizar por Factura",
+            subtitle = "Recomendado",
+            description = "Extraemos tus consumos reales automáticamente de tu PDF o foto.",
+            icon = Icons.Default.Description,
+            hasGlow = true,
+            onClick = onUploadClick
         )
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        Text(
-            text = "Analizamos tu factura en segundos y encontramos la tarifa que te hará ahorrar hasta 400€ al año.",
-            style = MaterialTheme.typography.bodyLarge,
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
-            modifier = Modifier.padding(horizontal = 32.dp),
-            lineHeight = 24.sp
+        // Card 2: Entrada Manual
+        ComparatorOptionCard(
+            title = "Entrada Manual",
+            subtitle = "Si no tienes factura",
+            description = "Introduce tus potencias y consumos tú mismo para un cálculo rápido.",
+            icon = Icons.Default.EditNote,
+            hasGlow = false,
+            onClick = onManualClick
         )
+    }
+}
 
-        Spacer(modifier = Modifier.height(40.dp))
-
-        Button(
-            onClick = onUploadClick,
+@Composable
+fun ComparatorOptionCard(
+    title: String,
+    subtitle: String,
+    description: String,
+    icon: ImageVector,
+    hasGlow: Boolean,
+    onClick: () -> Unit
+) {
+    val backgroundColor = if (hasGlow) {
+        if (MaterialTheme.colorScheme.background.luminance() < 0.5f) Color(0xFF1E293B) else Color.White
+    } else {
+        if (MaterialTheme.colorScheme.background.luminance() < 0.5f) Color(0xFF0F172A) else Color.White.copy(alpha = 0.5f)
+    }
+    
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
+        shape = RoundedCornerShape(28.dp),
+        colors = CardDefaults.cardColors(containerColor = backgroundColor),
+        border = BorderStroke(1.dp, if (hasGlow) MaterialTheme.colorScheme.primary.copy(alpha = 0.3f) else Color.White.copy(alpha = 0.05f))
+    ) {
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(64.dp)
-                .padding(horizontal = 24.dp),
-            shape = RoundedCornerShape(20.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
-            elevation = ButtonDefaults.buttonElevation(defaultElevation = 8.dp)
+                .padding(24.dp)
         ) {
-            Icon(Icons.Default.Analytics, contentDescription = null, modifier = Modifier.size(20.dp))
-            Spacer(modifier = Modifier.width(12.dp))
-            Text("COMPARAR MI FACTURA", fontWeight = FontWeight.Black, fontSize = 16.sp)
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        TextButton(
-            onClick = onMoreInfoClick,
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp)
-        ) {
-            Text("O introducir datos manualmente", color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f), fontWeight = FontWeight.Bold)
-        }
-
-        Spacer(modifier = Modifier.height(48.dp))
-
-        // Premium Hero Illustration
-        Box(
-            modifier = Modifier
-                .fillMaxWidth(0.92f)
-                .aspectRatio(1.4f)
-                .clip(RoundedCornerShape(32.dp))
-                .background(
-                    Brush.verticalGradient(
-                        colors = if (MaterialTheme.colorScheme.background.luminance() < 0.5f)
-                            listOf(Color(0xFF0F172A), Color(0xFF030712))
-                        else
-                            listOf(Color(0xFFE2E8F0), Color(0xFFF1F5F9))
-                    )
-                )
-                .border(1.dp, MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f), RoundedCornerShape(32.dp)),
-            contentAlignment = Alignment.Center
-        ) {
-            Column(
-                modifier = Modifier.fillMaxSize().padding(32.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                // Header of the "mock card"
-                Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    Box(modifier = Modifier.size(10.dp).background(Color(0xFFEF4444), CircleShape))
-                    Spacer(Modifier.width(6.dp))
-                    Box(modifier = Modifier.size(10.dp).background(Color(0xFFF59E0B), CircleShape))
-                    Spacer(Modifier.width(6.dp))
-                    Box(modifier = Modifier.size(10.dp).background(Color(0xFF10B981), CircleShape))
-                    Spacer(Modifier.weight(1f))
-                    Icon(Icons.Default.Analytics, null, tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f), modifier = Modifier.size(16.dp))
+                Surface(
+                    color = if (hasGlow) MaterialTheme.colorScheme.primary.copy(alpha = 0.2f) else Color.White.copy(alpha = 0.1f),
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.size(48.dp)
+                ) {
+                    Icon(
+                        icon,
+                        contentDescription = null,
+                        tint = if (hasGlow) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
+                        modifier = Modifier.padding(12.dp)
+                    )
                 }
                 
-                Spacer(modifier = Modifier.height(32.dp))
-                
-                // Visual chart bars
-                Row(
-                    modifier = Modifier.fillMaxWidth().weight(1f),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.Bottom
-                ) {
-                    repeat(14) { i ->
-                        val targetHeight = listOf(40, 60, 45, 80, 55, 90, 70, 40, 65, 85, 30, 75, 50, 95)[i]
-                        Box(
-                            modifier = Modifier
-                                .width(10.dp)
-                                .fillMaxHeight(targetHeight / 100f)
-                                .clip(RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp))
-                                .background(
-                                    Brush.verticalGradient(
-                                        colors = if (i == 6) listOf(MaterialTheme.colorScheme.primary, Color(0xFF6366F1))
-                                        else listOf(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f), MaterialTheme.colorScheme.onBackground.copy(alpha = 0.05f))
-                                    )
-                                )
+                if (hasGlow) {
+                    Surface(
+                        color = MaterialTheme.colorScheme.primary,
+                        shape = RoundedCornerShape(100.dp)
+                    ) {
+                        Text(
+                            text = subtitle.uppercase(),
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Black,
+                            color = Color.White
                         )
                     }
+                } else {
+                    Text(
+                        text = subtitle,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = TextSecondary,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
-                
-                Spacer(modifier = Modifier.height(24.dp))
-                
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.05f), RoundedCornerShape(16.dp))
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.SpaceAround
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("AHORRO", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f), fontWeight = FontWeight.Black)
-                        val savingText = if (totalSaving.startsWith("+") || totalSaving.startsWith("-")) totalSaving else "+$totalSaving"
-                        Text(savingText, fontWeight = FontWeight.Black, color = Color(0xFF10B981), fontSize = 18.sp)
-                    }
-                    VerticalDivider(modifier = Modifier.height(40.dp).width(1.dp), color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f))
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("ESTADO", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f), fontWeight = FontWeight.Black)
-                        val statusText = if (lastAnalysisDate == "No analizado") "PENDIENTE" else "OPTIMIZADO"
-                        Text(statusText, fontWeight = FontWeight.Black, color = if (statusText == "OPTIMIZADO") Color(0xFF10B981) else MaterialTheme.colorScheme.onBackground, fontSize = 18.sp)
-                    }
-                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Black,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = description,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+                lineHeight = 20.sp
+            )
+            
+            Spacer(modifier = Modifier.height(24.dp))
+            
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    "Empezar ahora",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = if (hasGlow) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
+                    fontWeight = FontWeight.Black
+                )
+                Spacer(Modifier.width(8.dp))
+                Icon(
+                    Icons.Default.ArrowForward,
+                    contentDescription = null,
+                    tint = if (hasGlow) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.size(16.dp)
+                )
             }
         }
     }
@@ -287,9 +583,11 @@ fun ProcessStepCard(index: String, icon: ImageVector, title: String, description
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 24.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        colors = CardDefaults.cardColors(
+            containerColor = if (MaterialTheme.colorScheme.background.luminance() < 0.5f) BackgroundOLED else Color.White
+        ),
         shape = RoundedCornerShape(28.dp),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.onBackground.copy(alpha = 0.05f))
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f))
     ) {
         Row(
             modifier = Modifier.padding(24.dp),
@@ -305,15 +603,15 @@ fun ProcessStepCard(index: String, icon: ImageVector, title: String, description
             Spacer(modifier = Modifier.width(20.dp))
             Column {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = title, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.onSurface, fontSize = 18.sp)
+                    Text(text = title, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.onBackground, fontSize = 18.sp)
                     Spacer(Modifier.weight(1f))
-                    Text(text = index, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f), fontWeight = FontWeight.Black)
+                    Text(text = index, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f), fontWeight = FontWeight.Black)
                 }
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = description,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = TextSecondary,
                     lineHeight = 20.sp
                 )
             }

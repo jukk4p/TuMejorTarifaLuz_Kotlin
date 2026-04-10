@@ -15,6 +15,8 @@ data class HomeUiState(
     val totalSaving: String = "0,00 €",
     val monthlyConsumption: String = "0 kWh",
     val lastAnalysisDate: String = "No analizado",
+    val currentPrice: Double = 0.1759,
+    val priceZone: String = "Precio normal",
     val isLoading: Boolean = false,
     val isLoggedIn: Boolean = false
 )

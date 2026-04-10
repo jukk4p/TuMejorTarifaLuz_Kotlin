@@ -15,6 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -27,6 +28,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.border
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.tumejortarifaluz.ui.viewmodel.ManualEntryViewModel
+
+import com.tumejortarifaluz.ui.theme.BackgroundDeep
+import com.tumejortarifaluz.ui.theme.BackgroundOLED
+import com.tumejortarifaluz.ui.theme.TextSecondary
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -79,7 +84,7 @@ fun ManualEntryScreen(
                     Text(
                         text = "Necesitamos estos datos para calcular tu ahorro real.",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
                         modifier = Modifier.padding(top = 8.dp)
                     )
                 }
@@ -233,7 +238,7 @@ fun ManualEntrySection(
             Text(
                 text = title,
                 style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = TextSecondary,
                 fontWeight = FontWeight.Bold,
                 letterSpacing = 1.sp,
                 textAlign = TextAlign.Center
@@ -241,9 +246,11 @@ fun ManualEntrySection(
         }
         Card(
             modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            colors = CardDefaults.cardColors(
+                containerColor = if (MaterialTheme.colorScheme.background.luminance() < 0.5f) BackgroundOLED else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
+            ),
             shape = RoundedCornerShape(24.dp),
-            border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f))
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f))
         ) {
             Column(
                 modifier = Modifier.padding(20.dp).fillMaxWidth(),
@@ -278,7 +285,7 @@ fun ManualTextField(
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
-            placeholder = { Text(placeholder, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f), fontSize = 14.sp) },
+            placeholder = { Text(placeholder, color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f), fontSize = 14.sp) },
             leadingIcon = if (icon != null) { 
                 { Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f), modifier = Modifier.size(18.dp)) } 
             } else null,
@@ -286,16 +293,16 @@ fun ManualTextField(
             shape = RoundedCornerShape(16.dp),
             isError = isError,
             supportingText = supportingText?.let { { Text(it) } },
-            textStyle = androidx.compose.ui.text.TextStyle(fontSize = 15.sp, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold),
+            textStyle = androidx.compose.ui.text.TextStyle(fontSize = 15.sp, color = MaterialTheme.colorScheme.onBackground, fontWeight = FontWeight.Bold),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
                 focusedBorderColor = MaterialTheme.colorScheme.primary,
-                unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f),
-                focusedContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.03f),
-                unfocusedContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.03f),
+                unfocusedBorderColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.12f),
+                focusedContainerColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.03f),
+                unfocusedContainerColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.03f),
                 focusedLabelColor = MaterialTheme.colorScheme.primary,
-                unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                unfocusedLabelColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
                 errorBorderColor = MaterialTheme.colorScheme.error,
                 cursorColor = MaterialTheme.colorScheme.primary
             ),
