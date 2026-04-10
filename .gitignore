@@ -1,0 +1,29 @@
+# Gradle files
+.gradle/
+build/
+
+# JetBrains IDE
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Kotlin
+.kotlin/
+
+# Android
+local.properties
+captures/
+.externalNativeBuild
+.cxx
+cmake-build-debug/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Project-specific backups or temporary files
+backup_2026_stable/
+*.tmp
+*.bak

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- This centered layer-list preserves the aspect ratio of the horizontal logo 
+         within the mandatory square splash icon space, preventing it from appearing squashed. -->
+    <!-- Using a native vector bolt temporarily to avoid squashing and 
+         pixelation issues while staying consistent with the brand. -->
+    <item android:gravity="center">
+        <inset
+            android:drawable="@drawable/ic_launcher_bolt"
+            android:inset="28dp" />
+    </item>
+</layer-list>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.TuMejorTarifaLuz" parent="Theme.Material3.DayNight.NoActionBar" />
+
+    <style name="Theme.TuMejorTarifaLuz.SplashScreen" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">#1A1F2E</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/logo_splash_system</item>
+        <item name="windowSplashScreenAnimationDuration">300</item>
+        <item name="postSplashScreenTheme">@style/Theme.TuMejorTarifaLuz</item>
+    </style>
+</resources>
