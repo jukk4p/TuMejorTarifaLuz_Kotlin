@@ -27,3 +27,19 @@ Thumbs.db
 backup_2026_stable/
 *.tmp
 *.bak
+
+# Binaries and build outputs
+*.apk
+*.ap_
+*.aab
+*.dex
+*.class
+bin/
+gen/
+release/
+
+# Security (Keystores and properties)
+*.jks
+*.keystore
+*.p12
+google-services.json
