@@ -55,7 +55,8 @@ data class ResultsUiState(
     val totalPossibleSaving: String = "0,00 €",
     val currentInvoice: ProcessedInvoice? = null,
     val selectedFilter: TariffFilter = TariffFilter.ALL,
-    val filterCounts: Map<TariffFilter, Int> = emptyMap()
+    val filterCounts: Map<TariffFilter, Int> = emptyMap(),
+    val searchQuery: String = ""
 )
 
 @HiltViewModel
@@ -69,6 +70,7 @@ class ResultsViewModel @Inject constructor(
     val uiState: StateFlow<ResultsUiState> = _uiState.asStateFlow()
 
     private val _selectedFilter = MutableStateFlow(TariffFilter.ALL)
+    private val _searchQuery = MutableStateFlow("")
 
     init {
         observeTariffsAndScan()
@@ -87,8 +89,9 @@ class ResultsViewModel @Inject constructor(
         combine(
             tariffRepository.getTariffs(),
             scanRepository.scanResult,
-            _selectedFilter
-        ) { tariffs, scanResult, filter ->
+            _selectedFilter,
+            _searchQuery
+        ) { tariffs, scanResult, filter, query ->
             val invoice = scanResult ?: com.tumejortarifaluz.domain.model.ProcessedInvoice()
 
             // Calculate bill for each tariff and sort cheapest first
@@ -117,11 +120,20 @@ class ResultsViewModel @Inject constructor(
                 allCalculated.count { t -> matchesFilter(t, f) }
             }
 
-            // Apply selected filter
-            val filtered = if (filter == TariffFilter.TOP4) {
+            // Apply selected filter and search query
+            val baseFiltered = if (filter == TariffFilter.TOP4) {
                 allCalculated.take(4) // Top 4 cheapest
             } else {
                 allCalculated.filter { matchesFilter(it, filter) }
+            }
+
+            val filtered = if (query.isEmpty()) {
+                baseFiltered
+            } else {
+                baseFiltered.filter { 
+                    it.company.contains(query, ignoreCase = true) || 
+                    it.name.contains(query, ignoreCase = true)
+                }
             }
 
             _uiState.update {
@@ -131,7 +143,8 @@ class ResultsViewModel @Inject constructor(
                     totalPossibleSaving = allCalculated.firstOrNull()?.estimatedSaving ?: "0,00 €",
                     currentInvoice = invoice,
                     selectedFilter = filter,
-                    filterCounts = counts
+                    filterCounts = counts,
+                    searchQuery = query
                 )
             }
         }.launchIn(viewModelScope)
@@ -150,6 +163,10 @@ class ResultsViewModel @Inject constructor(
 
     fun updateFilter(filter: TariffFilter) {
         _selectedFilter.value = filter
+    }
+
+    fun updateSearchQuery(query: String) {
+        _searchQuery.value = query
     }
 
     fun toggleFavorite(tariff: Tariff) {

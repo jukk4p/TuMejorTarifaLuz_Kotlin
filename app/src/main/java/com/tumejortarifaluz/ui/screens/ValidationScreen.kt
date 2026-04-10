@@ -173,10 +173,19 @@ fun ValidationScreen(
                             field.label.contains("CUPS", ignoreCase = true) -> Icons.Default.Grid3x3
                             else -> Icons.Default.Business
                         }
+                        val numericValue = field.value.filter { it.isDigit() || it == '.' || it == ',' }.replace(',', '.')
+                        val displayValue = if (field.label.contains("Consumo", ignoreCase = true) || field.label.contains("Importe", ignoreCase = true)) {
+                            numericValue.toDoubleOrNull()?.let { 
+                                java.text.DecimalFormat("#.##").format(it)
+                            }?.plus(if (field.label.contains("Consumo", ignoreCase = true)) " kWh" else " €") ?: field.value
+                        } else {
+                            field.value
+                        }
+                        
                         ValidationItem(
                             icon = icon, 
                             label = field.label.uppercase(), 
-                            value = field.value,
+                            value = displayValue,
                             onClick = { 
                                 if (field.isEditable) {
                                     viewModel.setEditingField(index)

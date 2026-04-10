@@ -115,7 +115,7 @@ fun ComparisonScreen(
                     .padding(padding),
                 contentPadding = PaddingValues(bottom = 24.dp)
             ) {
-                // Large Hero Section (Normalized Logo & Identity)
+                // Hero Section (Premium Brand Focus)
                 item {
                     Column(
                         modifier = Modifier
@@ -123,12 +123,13 @@ fun ComparisonScreen(
                             .padding(24.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
+                        // Company Logo & Name Card
                         Surface(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(140.dp),
-                            shape = RoundedCornerShape(24.dp),
-                            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.4f),
+                                .height(160.dp),
+                            shape = RoundedCornerShape(32.dp),
+                            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
                             border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))
                         ) {
                             Column(
@@ -137,7 +138,7 @@ fun ComparisonScreen(
                                 verticalArrangement = Arrangement.Center
                             ) {
                                 Box(
-                                    modifier = Modifier.size(140.dp, 60.dp),
+                                    modifier = Modifier.size(160.dp, 80.dp),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Image(
@@ -146,75 +147,100 @@ fun ComparisonScreen(
                                             isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
                                         )),
                                         contentDescription = tariff.company,
-                                        modifier = Modifier.fillMaxHeight().fillMaxWidth(0.8f)
+                                        modifier = Modifier.fillMaxHeight().fillMaxWidth(0.85f)
                                     )
                                 }
-                                Spacer(modifier = Modifier.height(8.dp))
                                 Text(
                                     text = tariff.name,
                                     style = MaterialTheme.typography.titleMedium,
                                     color = MaterialTheme.colorScheme.primary,
                                     fontWeight = FontWeight.Black,
-                                    textAlign = TextAlign.Center
+                                    letterSpacing = 0.5.sp
                                 )
                             }
                         }
                         
-                        Spacer(modifier = Modifier.height(32.dp))
+                        Spacer(modifier = Modifier.height(40.dp))
                         
-                        // Main Price Display with Glow
-                        Box(contentAlignment = Alignment.Center) {
-                            Box(
-                                modifier = Modifier
-                                    .size(200.dp, 100.dp)
-                                    .background(
-                                        androidx.compose.ui.graphics.Brush.radialGradient(
-                                            colors = listOf(
-                                                MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
-                                                Color.Transparent
-                                            )
-                                        )
-                                    )
+                        // Dramatic Price Display
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(
+                                "ESTIMACIÓN MENSUAL",
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Black,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                                letterSpacing = 2.sp
                             )
                             
                             Row(verticalAlignment = Alignment.Bottom) {
                                 Text(
                                     text = tariff.totalBill.replace(" €", ""),
-                                    style = MaterialTheme.typography.displayLarge.copy(fontSize = 58.sp),
+                                    style = MaterialTheme.typography.displayLarge.copy(
+                                        fontSize = 72.sp,
+                                        lineHeight = 72.sp
+                                    ),
                                     fontWeight = FontWeight.Black,
                                     color = MaterialTheme.colorScheme.onSurface,
-                                    letterSpacing = (-1).sp
+                                    letterSpacing = (-2).sp
                                 )
-                                Text(
-                                    text = " €",
-                                    style = MaterialTheme.typography.titleLarge,
-                                    fontWeight = FontWeight.Black,
-                                    color = MaterialTheme.colorScheme.onSurface,
-                                    modifier = Modifier.padding(bottom = 12.dp, start = 2.dp)
-                                )
-                                Text(
-                                    text = "/mes",
-                                    style = MaterialTheme.typography.labelMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
-                                    modifier = Modifier.padding(bottom = 12.dp, start = 2.dp)
-                                )
+                                Column(modifier = Modifier.padding(bottom = 12.dp, start = 4.dp)) {
+                                    Text(
+                                        text = "€",
+                                        style = MaterialTheme.typography.headlineMedium,
+                                        fontWeight = FontWeight.Black,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                    Text(
+                                        text = "neto/mes",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                                    )
+                                }
                             }
                         }
                         
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(32.dp))
                         
-                        Surface(
-                            color = Color(0xFF10B981).copy(alpha = 0.12f),
-                            shape = RoundedCornerShape(100.dp),
-                            border = BorderStroke(1.dp, Color(0xFF10B981).copy(alpha = 0.2f))
+                        // Visual Savings Meter
+                        val savingAmount = tariff.estimatedSaving.filter { it.isDigit() || it == ',' }.replace(',', '.').toFloatOrNull() ?: 0f
+                        val savingLevel = (savingAmount / 1000f).coerceIn(0.1f, 1f)
+                        
+                        Column(
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text("Nivel de Ahorro", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+                                Text("¡Excelente!", color = Color(0xFF10B981), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Black)
+                            }
+                            Spacer(Modifier.height(8.dp))
+                            Surface(
+                                modifier = Modifier.fillMaxWidth().height(10.dp),
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f),
+                                shape = CircleShape
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxHeight()
+                                        .fillMaxWidth(savingLevel.toFloat())
+                                        .background(
+                                            androidx.compose.ui.graphics.Brush.linearGradient(
+                                                colors = listOf(Color(0xFF10B981), Color(0xFF34D399))
+                                            ),
+                                            CircleShape
+                                        )
+                                )
+                            }
+                            Spacer(Modifier.height(8.dp))
                             Text(
-                                text = "↓ AHORRO DE ${tariff.estimatedSaving} AL AÑO",
-                                modifier = Modifier.padding(horizontal = 24.dp, vertical = 10.dp),
+                                text = "↓ ${tariff.estimatedSaving} de ahorro anual",
                                 color = Color(0xFF10B981),
                                 fontWeight = FontWeight.Black,
-                                fontSize = 14.sp,
-                                letterSpacing = 0.5.sp
+                                fontSize = 14.sp
                             )
                         }
                     }

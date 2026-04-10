@@ -97,6 +97,51 @@ fun ResultsScreen(
                     }
                 }
 
+                // Search Bar
+                OutlinedTextField(
+                    value = uiState.searchQuery,
+                    onValueChange = { viewModel.updateSearchQuery(it) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 20.dp),
+                    placeholder = { 
+                        Text(
+                            "Buscar compañía o tarifa...", 
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
+                            fontSize = 14.sp
+                        ) 
+                    },
+                    leadingIcon = { 
+                        Icon(
+                            Icons.Default.Search, 
+                            contentDescription = null, 
+                            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+                        ) 
+                    },
+                    trailingIcon = {
+                        if (uiState.searchQuery.isNotEmpty()) {
+                            IconButton(onClick = { viewModel.updateSearchQuery("") }) {
+                                Icon(
+                                    Icons.Default.Close, 
+                                    contentDescription = "Borrar",
+                                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+                        }
+                    },
+                    shape = RoundedCornerShape(16.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedContainerColor = MaterialTheme.colorScheme.surface,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.03f),
+                        focusedBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+                        unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f),
+                        cursorColor = MaterialTheme.colorScheme.primary
+                    ),
+                    singleLine = true,
+                    textStyle = LocalTextStyle.current.copy(fontSize = 14.sp)
+                )
+
                 // Filter options grid
                 val filters = TariffFilter.entries
                 filters.chunked(2).forEach { row ->
@@ -109,7 +154,7 @@ fun ResultsScreen(
                             Card(
                                 modifier = Modifier
                                     .weight(1f)
-                                    .height(110.dp)
+                                    .height(115.dp)
                                     .clickable {
                                         viewModel.updateFilter(filter)
                                         showFilterSheet = false
@@ -126,10 +171,20 @@ fun ResultsScreen(
                             ) {
                                 Box(modifier = Modifier.fillMaxSize().padding(16.dp)) {
                                     Column(modifier = Modifier.align(Alignment.CenterStart)) {
-                                        Text(filter.emoji, fontSize = 24.sp)
-                                        Spacer(Modifier.height(8.dp))
+                                        Icon(
+                                            imageVector = when(filter) {
+                                                TariffFilter.ALL -> Icons.Default.Bolt
+                                                TariffFilter.TOP4 -> Icons.Default.EmojiEvents
+                                                TariffFilter.FIXED -> Icons.Default.Lock
+                                                TariffFilter.THREE_PERIOD -> Icons.Default.Schedule
+                                            },
+                                            contentDescription = null,
+                                            tint = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                                            modifier = Modifier.size(28.dp)
+                                        )
+                                        Spacer(Modifier.height(10.dp))
                                         Text(
-                                            text = if (filter == TariffFilter.THREE_PERIOD) "Discrim. Horaria" else filter.label,
+                                            text = filter.label,
                                             fontWeight = FontWeight.Black,
                                             color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
                                             fontSize = 15.sp,
@@ -241,178 +296,159 @@ fun ResultsScreen(
                 }
             }
 
-            // Profile Card (Premium Glassmorphism Style)
+            // Profile Card (Premium Dashboard Style)
             item {
-                Box(
+                Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 24.dp, vertical = 12.dp)
-                        .clip(RoundedCornerShape(32.dp))
-                        .background(
-                            androidx.compose.ui.graphics.Brush.verticalGradient(
-                                colors = listOf(
-                                    MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
-                                    MaterialTheme.colorScheme.background.copy(alpha = 0.95f)
-                                )
-                            )
-                        )
-                        .border(
-                            1.dp,
-                            androidx.compose.ui.graphics.Brush.linearGradient(
-                                colors = listOf(
-                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
-                                    Color.Transparent,
-                                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
-                                )
-                            ),
-                            RoundedCornerShape(32.dp)
-                        )
+                        .padding(horizontal = 24.dp, vertical = 12.dp),
+                    shape = RoundedCornerShape(32.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f)),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))
                 ) {
                     Column(
                         modifier = Modifier.fillMaxWidth().padding(24.dp)
                     ) {
-                        // Header row: centered title with edit icon
+                        // Header with Pulsing Saving
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Center,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Surface(
-                                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-                                shape = CircleShape,
-                                modifier = Modifier.size(32.dp)
-                            ) {
-                                Icon(
-                                    Icons.Default.BarChart,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.padding(8.dp)
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    "ESTÁS AHORRANDO",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.Black,
+                                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f),
+                                    letterSpacing = 1.5.sp
+                                )
+                                Text(
+                                    uiState.tariffs.firstOrNull()?.estimatedSaving ?: "0,00 €",
+                                    style = MaterialTheme.typography.headlineLarge,
+                                    fontWeight = FontWeight.Black,
+                                    color = Color(0xFF10B981)
+                                )
+                                Text(
+                                    "Ahorro anual estimado",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
-                            Spacer(Modifier.width(12.dp))
-                            Text(
-                                text = "Mis datos de consumo",
-                                style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.onSurface,
-                                fontWeight = FontWeight.Black
-                            )
-                            Spacer(Modifier.width(8.dp))
+                            
                             IconButton(
                                 onClick = onEditConsumption,
-                                modifier = Modifier.size(24.dp)
+                                modifier = Modifier.background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f), CircleShape)
                             ) {
-                                Icon(
-                                    Icons.Default.Edit,
-                                    "Editar",
-                                    tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f),
-                                    modifier = Modifier.size(16.dp)
-                                )
+                                Icon(Icons.Default.Edit, "Editar", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(18.dp))
                             }
                         }
 
-                    Spacer(Modifier.height(16.dp))
-                    
-                    // New Info Grid: Company & Annual Saving
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
-                            Text("TU COMPAÑÍA", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            Text(uiState.currentInvoice?.company ?: "Otras Comercializadoras", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold, maxLines = 1)
-                        }
-                        VerticalDivider(modifier = Modifier.height(30.dp).width(1.dp), color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f))
-                        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
-                            Text("AHORRO ANUAL", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            Text("↓ ${uiState.tariffs.firstOrNull()?.estimatedSaving ?: "0,00 €"}", color = Color(0xFF10B981), fontWeight = FontWeight.ExtraBold)
-                        }
-                    }
-                    
-                    Spacer(Modifier.height(14.dp))
-                    HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f))
-                    
-                    // Saving Comparison Section
-                    Column(
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
+                        Spacer(Modifier.height(24.dp))
+                        HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f))
+                        Spacer(Modifier.height(24.dp))
+
+                        // Consumption Visual Grid
                         Text(
-                            text = "ESTIMACIÓN DE AHORRO MENSUAL",
+                            "DETALLE DE CONSUMO",
                             style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                             fontWeight = FontWeight.Bold,
-                            letterSpacing = 0.5.sp
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(bottom = 16.dp)
                         )
-                        Spacer(Modifier.height(8.dp))
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(
-                                text = uiState.currentInvoice?.totalAmount ?: "0,00 €",
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
-                                textDecoration = androidx.compose.ui.text.style.TextDecoration.LineThrough
-                            )
-                            Icon(
-                                Icons.Default.ArrowForward,
-                                contentDescription = null,
-                                modifier = Modifier.padding(horizontal = 12.dp).size(16.dp),
-                                tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
-                            )
-                            Text(
-                                text = uiState.tariffs.firstOrNull()?.totalBill ?: "0,00 €",
-                                style = MaterialTheme.typography.headlineSmall,
-                                fontWeight = FontWeight.Black,
-                                color = Color(0xFF10B981)
-                            )
+
+                        // Consolidated Consumption Display - Layered for absolute alignment
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            // Row 1: Badges
+                            Row(modifier = Modifier.fillMaxWidth()) {
+                                listOf("PUNTA" to Color(0xFFF87171), "LLANO" to Color(0xFFFBBF24), "VALLE" to Color(0xFF34D399)).forEach { (label, color) ->
+                                    Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                                        Surface(color = color.copy(alpha = 0.1f), shape = RoundedCornerShape(12.dp)) {
+                                            Text(text = label, modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp), style = MaterialTheme.typography.labelSmall.copy(fontSize = 8.sp), fontWeight = FontWeight.Black, color = color)
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            Spacer(Modifier.height(16.dp))
+                            
+                            // Row 2: Values (Forced baseline alignment)
+                            Row(
+                                modifier = Modifier.fillMaxWidth().height(40.dp),
+                                verticalAlignment = Alignment.Bottom
+                            ) {
+                                val energy = listOf(
+                                    uiState.currentInvoice?.energyP1?.toInt() ?: 0,
+                                    uiState.currentInvoice?.energyP2?.toInt() ?: 0,
+                                    uiState.currentInvoice?.energyP3?.toInt() ?: 0
+                                )
+                                energy.forEach { e ->
+                                    Row(
+                                        modifier = Modifier.weight(1f).alignByBaseline(),
+                                        horizontalArrangement = Arrangement.Center,
+                                        verticalAlignment = Alignment.Bottom
+                                    ) {
+                                        Text(
+                                            text = e.toString(),
+                                            style = MaterialTheme.typography.headlineSmall,
+                                            fontWeight = FontWeight.Black,
+                                            color = MaterialTheme.colorScheme.onSurface,
+                                            modifier = Modifier.alignByBaseline()
+                                        )
+                                        Text(
+                                            text = " kWh", 
+                                            style = MaterialTheme.typography.labelSmall, 
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                                            modifier = Modifier.padding(bottom = 4.dp).alignByBaseline()
+                                        )
+                                    }
+                                }
+                            }
+                            
+                            Spacer(Modifier.height(8.dp))
+                            
+                            // Row 3: Indicators
+                            Row(modifier = Modifier.fillMaxWidth()) {
+                                listOf(Color(0xFFF87171), Color(0xFFFBBF24), Color(0xFF34D399)).forEach { color ->
+                                    Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                                        Box(modifier = Modifier.width(36.dp).height(4.dp).background(color, CircleShape))
+                                    }
+                                }
+                            }
                         }
-                        Spacer(Modifier.height(4.dp))
-                        Text(
-                            text = "Ahorrarías ${uiState.tariffs.firstOrNull()?.estimatedSavingMonthly ?: "0,00 €"} al mes",
-                            style = MaterialTheme.typography.labelMedium,
-                            color = Color(0xFF10B981).copy(alpha = 0.8f),
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                    
-                    HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f))
-                    Spacer(Modifier.height(14.dp))
-                    
-                    // Detailed Consumption Grid
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
-                            Text("E. PUNTA", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 9.sp)
-                            Text("${uiState.currentInvoice?.energyP1?.toInt() ?: 0}", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Black, fontSize = 14.sp)
-                        }
-                        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
-                            Text("E. LLANO", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 9.sp)
-                            Text("${uiState.currentInvoice?.energyP2?.toInt() ?: 0}", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Black, fontSize = 14.sp)
-                        }
-                        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
-                            Text("E. VALLE", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 9.sp)
-                            Text("${uiState.currentInvoice?.energyP3?.toInt() ?: 0}", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Black, fontSize = 14.sp)
-                        }
-                    }
-                    
-                    Spacer(Modifier.height(16.dp))
-                    
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
-                        horizontalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
-                            Text("P. PUNTA", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 9.sp)
-                            Text("${uiState.currentInvoice?.powerP1 ?: 0.0} kW", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Black, fontSize = 14.sp)
-                        }
-                        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
-                            Text("P. VALLE", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 9.sp)
-                            Text("${uiState.currentInvoice?.powerP2 ?: 0.0} kW", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Black, fontSize = 14.sp)
+
+                        Spacer(Modifier.height(24.dp))
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            // Quick Stats Box
+                            Surface(
+                                modifier = Modifier.weight(1f),
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.03f),
+                                shape = RoundedCornerShape(16.dp)
+                            ) {
+                                Column(Modifier.padding(12.dp)) {
+                                    Text("COMPAÑÍA ACTUAL", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    Text(uiState.currentInvoice?.company ?: "Otras", fontSize = 13.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+                                }
+                            }
+                            Surface(
+                                modifier = Modifier.weight(1f),
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.03f),
+                                shape = RoundedCornerShape(16.dp)
+                            ) {
+                                Column(Modifier.padding(12.dp)) {
+                                    Text("POTENCIA CONTRATADA", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    val p1 = uiState.currentInvoice?.powerP1 ?: 0.0
+                                    val p2 = uiState.currentInvoice?.powerP2 ?: 0.0
+                                    val powerText = if (p1 == p2) "$p1 kW" else "P: $p1 | V: $p2 kW"
+                                    Text(powerText, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                                }
+                            }
                         }
                     }
                 }
-            }
             }
 
             // Section Header (Centered)
@@ -714,41 +750,41 @@ fun ResultsFloatingMenu(
     onSaveClick: () -> Unit
 ) {
     Surface(
-        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.98f),
-        shape = RoundedCornerShape(100.dp),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f)),
-        shadowElevation = 8.dp,
+        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f),
+        shape = RoundedCornerShape(24.dp),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)),
+        shadowElevation = 12.dp,
         modifier = Modifier
             .padding(bottom = 16.dp)
-            .width(280.dp)
-            .height(64.dp)
+            .fillMaxWidth(0.9f)
+            .height(80.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             FloatingMenuItem(
-                icon = Icons.Default.Tune,
+                icon = Icons.Default.FilterList,
                 label = "FILTROS",
                 onClick = onFilterClick,
                 modifier = Modifier.weight(1f)
             )
             
             VerticalDivider(
-                modifier = Modifier.height(32.dp).width(1.dp),
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f)
+                modifier = Modifier.height(30.dp).width(1.dp),
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f)
             )
             
             FloatingMenuItem(
-                icon = Icons.Default.Add,
-                label = "NUEVA COMP.",
+                icon = Icons.Default.AddCircleOutline,
+                label = "NUEVA",
                 onClick = onNewClick,
                 modifier = Modifier.weight(1f)
             )
             
             VerticalDivider(
-                modifier = Modifier.height(32.dp).width(1.dp),
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f)
+                modifier = Modifier.height(30.dp).width(1.dp),
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f)
             )
             
             FloatingMenuItem(
@@ -799,3 +835,66 @@ private fun FloatingMenuItem(
         }
     }
 }
+
+@Composable
+fun ConsumptionMeter(
+    label: String,
+    value: String,
+    color: Color,
+    unit: String
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.width(IntrinsicSize.Min)
+    ) {
+        Surface(
+            color = color.copy(alpha = 0.1f),
+            shape = RoundedCornerShape(12.dp),
+            modifier = Modifier.padding(bottom = 8.dp)
+        ) {
+            Box(
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.labelSmall.copy(fontSize = 8.sp),
+                    fontWeight = FontWeight.Black,
+                    color = color
+                )
+            }
+        }
+        
+        Row(verticalAlignment = Alignment.Bottom) {
+            Text(
+                text = value,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Black,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Text(
+                text = " $unit",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(bottom = 4.dp)
+            )
+        }
+        
+        Spacer(Modifier.height(4.dp))
+        
+        // Mini Indicator Bar
+        Surface(
+            modifier = Modifier.width(40.dp).height(4.dp),
+            color = color.copy(alpha = 0.2f),
+            shape = CircleShape
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .fillMaxWidth(0.6f)
+                    .background(color, CircleShape)
+            )
+        }
+    }
+}
+
