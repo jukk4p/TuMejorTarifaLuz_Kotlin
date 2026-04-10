@@ -15,7 +15,7 @@ import javax.inject.Singleton
 class InvoiceProcessor @Inject constructor() {
 
     // Using Standalone Google AI SDK (Legacy 2026 Support)
-    private val apiKey = "AIzaSyADqr1OtruxNEWBk-4BMcGBUosFLaSz3OE"
+    private val apiKey = BuildConfig.GEMINI_API_KEY
     
     private val generativeModel = GenerativeModel(
         modelName = "gemini-2.5-flash",
