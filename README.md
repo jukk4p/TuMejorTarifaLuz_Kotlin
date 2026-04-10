@@ -2,6 +2,9 @@
 
 TuMejorTarifaLuz es una aplicación Android desarrollada en **Kotlin** con **Jetpack Compose** diseñada para ayudar a los usuarios en España a comparar y encontrar la mejor tarifa eléctrica según su consumo real.
 
+> [!NOTE]
+> Esta aplicación es una **adaptación a Kotlin de la versión web** de [tumejortarifaluz.es](https://www.tumejortarifaluz.es), ofreciendo una experiencia simplificada y optimizada para dispositivos Android.
+
 ## 🚀 Características
 
 - **Comparador Inteligente**: Analiza tu consumo en diferentes periodos (Punta, Llano, Valle) y lo compara con las tarifas más competitivas del mercado.
